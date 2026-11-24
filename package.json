@@ -1,0 +1,14 @@
+{
+  "name": "plant-care-hub",
+  "version": "1.0.0",
+  "description": "SIT725 Task 3.2P - Express + Materialize web app with a GET REST endpoint (plant care catalogue)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Zalak Joishar",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

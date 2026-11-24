@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plant Care Hub</title>
+
+  <!-- Materialize CSS and Google icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navigation bar -->
+  <nav class="green darken-3">
+    <div class="nav-wrapper container">
+      <a href="#" class="brand-logo"><i class="material-icons">local_florist</i>Plant Care Hub</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#plants">Plants</a></li>
+        <li><a class="modal-trigger" href="#addPlantModal">Add a plant</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero section -->
+  <div class="hero green lighten-5">
+    <div class="container center-align">
+      <h3 class="green-text text-darken-4">Happy plants, happy home</h3>
+      <p class="flow-text grey-text text-darken-2">Simple care guides for popular indoor plants. Tap a card to see how much light and water each one needs.</p>
+      <a class="btn-large waves-effect waves-light green darken-2 modal-trigger" href="#addPlantModal">
+        <i class="material-icons left">add</i>Add a plant
+      </a>
+    </div>
+  </div>
+
+  <!-- Cards are added here by scripts.js after calling GET /api/plants -->
+  <div class="container section" id="plants">
+    <h5 class="grey-text text-darken-3">Plant catalogue</h5>
+    <div class="row" id="card-section">
+      <div class="col s12 center-align" id="loading">
+        <div class="preloader-wrapper small active">
+          <div class="spinner-layer spinner-green-only">
+            <div class="circle-clipper left"><div class="circle"></div></div>
+            <div class="gap-patch"><div class="circle"></div></div>
+            <div class="circle-clipper right"><div class="circle"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add plant modal form -->
+  <div id="addPlantModal" class="modal">
+    <div class="modal-content">
+      <h5 class="green-text text-darken-3">Add a plant</h5>
+      <form id="plantForm">
+        <div class="input-field">
+          <i class="material-icons prefix">local_florist</i>
+          <input id="plantName" type="text" required>
+          <label for="plantName">Plant name</label>
+        </div>
+        <div class="input-field">
+          <i class="material-icons prefix">wb_sunny</i>
+          <input id="plantLight" type="text">
+          <label for="plantLight">Light needs (e.g. bright, indirect)</label>
+        </div>
+        <div class="input-field">
+          <i class="material-icons prefix">opacity</i>
+          <input id="plantWater" type="text">
+          <label for="plantWater">Watering (e.g. weekly)</label>
+        </div>
+        <div class="input-field">
+          <i class="material-icons prefix">notes</i>
+          <textarea id="plantDescription" class="materialize-textarea"></textarea>
+          <label for="plantDescription">Care notes</label>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close btn-flat">Cancel</a>
+      <button id="formSubmit" class="btn green darken-2 waves-effect waves-light">Submit</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer green darken-4">
+    <div class="container">
+      <p class="white-text">Plant Care Hub · SIT725 Task 3.2P · Built with Express and Materialize</p>
+    </div>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="js/scripts.js"></script>
+</body>
+</html>
