@@ -3,92 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plant Care Hub</title>
+  <title>Leaf Ledger · Plant care dashboard</title>
 
-  <!-- Materialize CSS and Google icons -->
+  <!-- Materialize CSS, Google icons and fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito+Sans:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <!-- Navigation bar -->
-  <nav class="green darken-3">
-    <div class="nav-wrapper container">
-      <a href="#" class="brand-logo"><i class="material-icons">local_florist</i>Plant Care Hub</a>
-      <ul class="right hide-on-med-and-down">
-        <li><a href="#plants">Plants</a></li>
-        <li><a class="modal-trigger" href="#addPlantModal">Add a plant</a></li>
-      </ul>
-    </div>
-  </nav>
+  <!-- Fixed side navigation (collapses to a menu button on small screens) -->
+  <ul id="side-menu" class="sidenav sidenav-fixed">
+    <li class="brand">
+      <i class="material-icons">eco</i>
+      <span>Leaf Ledger</span>
+      <small>Plant care dashboard</small>
+    </li>
+    <li><a href="#" class="side-filter active" data-filter="all"><i class="material-icons">dashboard</i>All plants</a></li>
+    <li><a href="#" class="side-filter" data-filter="easy"><i class="material-icons">sentiment_satisfied</i>Easy care</a></li>
+    <li><a href="#" class="side-filter" data-filter="low"><i class="material-icons">nights_stay</i>Low light</a></li>
+    <li><a href="#" class="side-filter" data-filter="high"><i class="material-icons">wb_sunny</i>Sun lovers</a></li>
+    <li><div class="divider"></div></li>
+    <li><a href="#addPlantModal" class="modal-trigger"><i class="material-icons">add_circle_outline</i>Add a plant</a></li>
+    <li class="side-tip">
+      <i class="material-icons">lightbulb_outline</i>
+      <p>Tip: most houseplants die from too much water, not too little. Check the soil first.</p>
+    </li>
+  </ul>
 
-  <!-- Hero section -->
-  <div class="hero green lighten-5">
-    <div class="container center-align">
-      <h3 class="green-text text-darken-4">Happy plants, happy home</h3>
-      <p class="flow-text grey-text text-darken-2">Simple care guides for popular indoor plants. Tap a card to see how much light and water each one needs.</p>
-      <a class="btn-large waves-effect waves-light green darken-2 modal-trigger" href="#addPlantModal">
-        <i class="material-icons left">add</i>Add a plant
-      </a>
+  <main>
+    <!-- Top bar with menu button (mobile) and search -->
+    <div class="topbar">
+      <a href="#" data-target="side-menu" class="sidenav-trigger hide-on-large-only"><i class="material-icons">menu</i></a>
+      <div>
+        <h4 class="page-title">My plant collection</h4>
+        <p class="page-subtitle">Everything you need to keep your plants alive and growing.</p>
+      </div>
+      <div class="input-field search-box">
+        <i class="material-icons prefix">search</i>
+        <input id="search" type="text" autocomplete="off">
+        <label for="search">Search plants</label>
+      </div>
     </div>
+
+    <!-- Summary tiles (calculated from the API data) -->
+    <div class="row stats">
+      <div class="col s12 m4"><div class="stat-tile"><i class="material-icons">local_florist</i><div><span id="stat-total">0</span><p>Plants in the ledger</p></div></div></div>
+      <div class="col s12 m4"><div class="stat-tile"><i class="material-icons">sentiment_satisfied</i><div><span id="stat-easy">0</span><p>Easy-care plants</p></div></div></div>
+      <div class="col s12 m4"><div class="stat-tile accent"><i class="material-icons">opacity</i><div><span id="stat-water">0</span><p>Need water this week</p></div></div></div>
+    </div>
+
+    <!-- Filter tabs -->
+    <ul class="tabs plant-tabs">
+      <li class="tab"><a href="#" class="tab-filter active" data-filter="all">All</a></li>
+      <li class="tab"><a href="#" class="tab-filter" data-filter="easy">Easy care</a></li>
+      <li class="tab"><a href="#" class="tab-filter" data-filter="low">Low light</a></li>
+      <li class="tab"><a href="#" class="tab-filter" data-filter="high">Sun lovers</a></li>
+    </ul>
+
+    <!-- Plant list: filled by scripts.js after calling GET /api/plants -->
+    <div class="row" id="plant-list">
+      <div class="col s12 center-align loading">
+        <div class="progress"><div class="indeterminate"></div></div>
+        <p>Loading your plants…</p>
+      </div>
+    </div>
+    <p id="no-results" class="center-align hide">No plants match your search.</p>
+  </main>
+
+  <!-- Floating action button -->
+  <div class="fixed-action-btn">
+    <a class="btn-floating btn-large tooltipped modal-trigger" href="#addPlantModal" data-position="left" data-tooltip="Add a plant">
+      <i class="material-icons">add</i>
+    </a>
   </div>
 
-  <!-- Cards are added here by scripts.js after calling GET /api/plants -->
-  <div class="container section" id="plants">
-    <h5 class="grey-text text-darken-3">Plant catalogue</h5>
-    <div class="row" id="card-section">
-      <div class="col s12 center-align" id="loading">
-        <div class="preloader-wrapper small active">
-          <div class="spinner-layer spinner-green-only">
-            <div class="circle-clipper left"><div class="circle"></div></div>
-            <div class="gap-patch"><div class="circle"></div></div>
-            <div class="circle-clipper right"><div class="circle"></div></div>
-          </div>
+  <!-- Care guide modal (filled when a card's button is clicked) -->
+  <div id="careModal" class="modal care-modal">
+    <div class="modal-content">
+      <div class="row">
+        <div class="col s12 m5"><img id="care-image" class="responsive-img" src="" alt=""></div>
+        <div class="col s12 m7">
+          <span id="care-difficulty" class="difficulty"></span>
+          <h4 id="care-title"></h4>
+          <p id="care-description"></p>
+          <ul class="collection">
+            <li class="collection-item"><i class="material-icons">wb_sunny</i><span>Light</span><b id="care-light"></b></li>
+            <li class="collection-item"><i class="material-icons">opacity</i><span>Watering</span><b id="care-water"></b></li>
+          </ul>
         </div>
       </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close btn-flat">Close</a>
     </div>
   </div>
 
   <!-- Add plant modal form -->
-  <div id="addPlantModal" class="modal">
+  <div id="addPlantModal" class="modal add-modal">
     <div class="modal-content">
-      <h5 class="green-text text-darken-3">Add a plant</h5>
+      <h4>Add a plant to the ledger</h4>
       <form id="plantForm">
-        <div class="input-field">
-          <i class="material-icons prefix">local_florist</i>
-          <input id="plantName" type="text" required>
-          <label for="plantName">Plant name</label>
-        </div>
-        <div class="input-field">
-          <i class="material-icons prefix">wb_sunny</i>
-          <input id="plantLight" type="text">
-          <label for="plantLight">Light needs (e.g. bright, indirect)</label>
-        </div>
-        <div class="input-field">
-          <i class="material-icons prefix">opacity</i>
-          <input id="plantWater" type="text">
-          <label for="plantWater">Watering (e.g. weekly)</label>
-        </div>
-        <div class="input-field">
-          <i class="material-icons prefix">notes</i>
-          <textarea id="plantDescription" class="materialize-textarea"></textarea>
-          <label for="plantDescription">Care notes</label>
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="plantName" type="text" required>
+            <label for="plantName">Plant name</label>
+          </div>
+          <div class="input-field col s12 m6">
+            <select id="plantLight">
+              <option value="low">Low light</option>
+              <option value="medium" selected>Medium, indirect light</option>
+              <option value="high">Bright or direct sun</option>
+            </select>
+            <label>Light needs</label>
+          </div>
+          <div class="col s12 m6">
+            <label for="plantWater">Water every <b id="waterValue">7</b> days</label>
+            <p class="range-field"><input type="range" id="plantWater" min="1" max="30" value="7"></p>
+          </div>
+          <div class="col s12 m6">
+            <label>Difficulty</label>
+            <p class="radios">
+              <label><input name="difficulty" type="radio" value="Easy" checked><span>Easy</span></label>
+              <label><input name="difficulty" type="radio" value="Moderate"><span>Moderate</span></label>
+            </p>
+          </div>
+          <div class="input-field col s12">
+            <textarea id="plantDescription" class="materialize-textarea"></textarea>
+            <label for="plantDescription">Care notes</label>
+          </div>
         </div>
       </form>
     </div>
     <div class="modal-footer">
       <a href="#!" class="modal-close btn-flat">Cancel</a>
-      <button id="formSubmit" class="btn green darken-2 waves-effect waves-light">Submit</button>
+      <button id="formSubmit" class="btn waves-effect waves-light"><i class="material-icons left">check</i>Add plant</button>
     </div>
   </div>
-
-  <!-- Footer -->
-  <footer class="page-footer green darken-4">
-    <div class="container">
-      <p class="white-text">Plant Care Hub · SIT725 Task 3.2P · Built with Express and Materialize</p>
-    </div>
-  </footer>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>

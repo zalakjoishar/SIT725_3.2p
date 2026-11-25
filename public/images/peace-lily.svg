@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" width="400" height="260">
-<rect width="400" height="260" fill="#eceff1"/>
-<circle cx="330" cy="50" r="26" fill="#fff" opacity="0.5"/>
-<rect x="0" y="228" width="400" height="32" fill="#000" opacity="0.06"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="76 26 248 236" width="248" height="236">
+<rect width="400" height="260" fill="#f6f1e9"/><circle cx="200" cy="150" r="118" fill="#eceff1"/><circle cx="200" cy="150" r="118" fill="none" stroke="#e3d9c9" stroke-width="3"/>
+
+<ellipse cx="200" cy="238" rx="70" ry="7" fill="#000" opacity="0.08"/>
 <g transform="rotate(-50 200 178)"><path d="M200 178 Q175 120 200 70 Q225 120 200 178 Z" fill="#1b5e20"/><path d="M200 172 L200 80" stroke="#43a047" stroke-width="2"/></g><g transform="rotate(-25 200 178)"><path d="M200 178 Q175 120 200 70 Q225 120 200 178 Z" fill="#1b5e20"/><path d="M200 172 L200 80" stroke="#43a047" stroke-width="2"/></g><g transform="rotate(0 200 178)"><path d="M200 178 Q175 120 200 70 Q225 120 200 178 Z" fill="#1b5e20"/><path d="M200 172 L200 80" stroke="#43a047" stroke-width="2"/></g><g transform="rotate(25 200 178)"><path d="M200 178 Q175 120 200 70 Q225 120 200 178 Z" fill="#1b5e20"/><path d="M200 172 L200 80" stroke="#43a047" stroke-width="2"/></g><g transform="rotate(50 200 178)"><path d="M200 178 Q175 120 200 70 Q225 120 200 178 Z" fill="#1b5e20"/><path d="M200 172 L200 80" stroke="#43a047" stroke-width="2"/></g><path d="M200 170 Q182.5 120 165 80" stroke="#2e7d32" stroke-width="3" fill="none"/><path d="M165 80 Q151 60 165 42 Q179 60 165 80 Z" fill="#fff" stroke="#e0e0e0"/><rect x="163" y="54" width="4" height="18" rx="2" fill="#fdd835"/><path d="M200 170 Q217.5 115 235 75" stroke="#2e7d32" stroke-width="3" fill="none"/><path d="M235 75 Q221 55 235 37 Q249 55 235 75 Z" fill="#fff" stroke="#e0e0e0"/><rect x="233" y="49" width="4" height="18" rx="2" fill="#fdd835"/><path d="M200 170 Q200.0 100 200 60" stroke="#2e7d32" stroke-width="3" fill="none"/><path d="M200 60 Q186 40 200 22 Q214 40 200 60 Z" fill="#fff" stroke="#e0e0e0"/><rect x="198" y="34" width="4" height="18" rx="2" fill="#fdd835"/>
 <path d="M160 180 L240 180 L230 236 L170 236 Z" fill="#ffffff"/>
 <rect x="152" y="172" width="96" height="14" rx="4" fill="#e0e0e0"/>
