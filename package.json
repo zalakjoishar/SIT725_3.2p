@@ -1,14 +1,17 @@
 {
   "name": "plant-care-hub",
-  "version": "1.0.0",
-  "description": "SIT725 Task 3.2P - Express + Materialize web app with a GET REST endpoint (plant care catalogue)",
+  "version": "2.0.0",
+  "description": "SIT725 Task 4.2P - Plant Care Hub with Express, Materialize and MongoDB (Mongoose)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "seed": "node seed.js"
   },
   "author": "Zalak Joishar",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^18.0.10",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
   }
 }

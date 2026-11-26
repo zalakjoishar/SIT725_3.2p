@@ -1,4 +1,4 @@
-/* Leaf Ledger theme: charcoal sidebar, warm cream page, terracotta accents */
+/* Plant Care Hub theme: charcoal sidebar, warm cream page, terracotta accents */
 :root {
   --ink: #1f2a24;
   --ink-soft: #55615a;
@@ -43,7 +43,7 @@ h4, h5, .brand span, .stat-tile span {
   line-height: 1.2;
 }
 .sidenav .brand i { color: var(--terracotta); font-size: 34px; vertical-align: middle; }
-.sidenav .brand span { color: #fff; font-size: 28px; vertical-align: middle; margin-left: 6px; }
+.sidenav .brand span { color: #fff; font-size: 24px; white-space: nowrap; vertical-align: middle; margin-left: 6px; }
 .sidenav .brand small { display: block; color: #9fb0a5; margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; font-size: 11px; }
 
 .sidenav .side-tip {
@@ -190,3 +190,14 @@ main {
 
 .toast.toast-ok { background: var(--ink); border-left: 5px solid var(--terracotta); }
 .toast.toast-warn { background: var(--terracotta-dark); }
+
+/* ---------- Added for the database version ---------- */
+.scientific { font-style: italic; color: var(--ink-soft); margin: -4px 0 10px; }
+.plant-card .scientific { margin: -8px 0 8px; font-size: 14px; }
+.difficulty.hard { background: #f3dede; color: #8e3b3b; }
+.pet-badge { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; font-size: 12px; font-weight: 700; color: #3f6b4c; }
+.pet-badge i { font-size: 16px; }
+.delete-btn { color: #b23b3b !important; float: left !important; }
+.switch label input[type=checkbox]:checked + .lever { background-color: #e9b99f; }
+.switch label input[type=checkbox]:checked + .lever:after { background-color: var(--terracotta); }
+.add-modal .switch { margin-top: 12px; }

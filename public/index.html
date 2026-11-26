@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaf Ledger · Plant care dashboard</title>
+  <title>Plant Care Hub · Plant care dashboard</title>
 
   <!-- Materialize CSS, Google icons and fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
@@ -17,13 +17,14 @@
   <ul id="side-menu" class="sidenav sidenav-fixed">
     <li class="brand">
       <i class="material-icons">eco</i>
-      <span>Leaf Ledger</span>
+      <span>Plant Care Hub</span>
       <small>Plant care dashboard</small>
     </li>
     <li><a href="#" class="side-filter active" data-filter="all"><i class="material-icons">dashboard</i>All plants</a></li>
     <li><a href="#" class="side-filter" data-filter="easy"><i class="material-icons">sentiment_satisfied</i>Easy care</a></li>
     <li><a href="#" class="side-filter" data-filter="low"><i class="material-icons">nights_stay</i>Low light</a></li>
     <li><a href="#" class="side-filter" data-filter="high"><i class="material-icons">wb_sunny</i>Sun lovers</a></li>
+    <li><a href="#" class="side-filter" data-filter="petsafe"><i class="material-icons">pets</i>Pet safe</a></li>
     <li><div class="divider"></div></li>
     <li><a href="#addPlantModal" class="modal-trigger"><i class="material-icons">add_circle_outline</i>Add a plant</a></li>
     <li class="side-tip">
@@ -38,7 +39,7 @@
       <a href="#" data-target="side-menu" class="sidenav-trigger hide-on-large-only"><i class="material-icons">menu</i></a>
       <div>
         <h4 class="page-title">My plant collection</h4>
-        <p class="page-subtitle">Everything you need to keep your plants alive and growing.</p>
+        <p class="page-subtitle">Your plants are saved in MongoDB, so nothing is lost when you refresh.</p>
       </div>
       <div class="input-field search-box">
         <i class="material-icons prefix">search</i>
@@ -49,8 +50,8 @@
 
     <!-- Summary tiles (calculated from the API data) -->
     <div class="row stats">
-      <div class="col s12 m4"><div class="stat-tile"><i class="material-icons">local_florist</i><div><span id="stat-total">0</span><p>Plants in the ledger</p></div></div></div>
-      <div class="col s12 m4"><div class="stat-tile"><i class="material-icons">sentiment_satisfied</i><div><span id="stat-easy">0</span><p>Easy-care plants</p></div></div></div>
+      <div class="col s12 m4"><div class="stat-tile"><i class="material-icons">local_florist</i><div><span id="stat-total">0</span><p>Plants in the database</p></div></div></div>
+      <div class="col s12 m4"><div class="stat-tile"><i class="material-icons">pets</i><div><span id="stat-petsafe">0</span><p>Safe for cats and dogs</p></div></div></div>
       <div class="col s12 m4"><div class="stat-tile accent"><i class="material-icons">opacity</i><div><span id="stat-water">0</span><p>Need water this week</p></div></div></div>
     </div>
 
@@ -60,6 +61,7 @@
       <li class="tab"><a href="#" class="tab-filter" data-filter="easy">Easy care</a></li>
       <li class="tab"><a href="#" class="tab-filter" data-filter="low">Low light</a></li>
       <li class="tab"><a href="#" class="tab-filter" data-filter="high">Sun lovers</a></li>
+      <li class="tab"><a href="#" class="tab-filter" data-filter="petsafe">Pet safe</a></li>
     </ul>
 
     <!-- Plant list: filled by scripts.js after calling GET /api/plants -->
@@ -87,15 +89,19 @@
         <div class="col s12 m7">
           <span id="care-difficulty" class="difficulty"></span>
           <h4 id="care-title"></h4>
+          <p id="care-scientific" class="scientific"></p>
           <p id="care-description"></p>
           <ul class="collection">
             <li class="collection-item"><i class="material-icons">wb_sunny</i><span>Light</span><b id="care-light"></b></li>
             <li class="collection-item"><i class="material-icons">opacity</i><span>Watering</span><b id="care-water"></b></li>
+            <li class="collection-item"><i class="material-icons">pets</i><span>Pets</span><b id="care-pets"></b></li>
+            <li class="collection-item"><i class="material-icons">event</i><span>Added</span><b id="care-added"></b></li>
           </ul>
         </div>
       </div>
     </div>
     <div class="modal-footer">
+      <a href="#!" id="deletePlant" class="btn-flat delete-btn"><i class="material-icons left">delete_outline</i>Remove plant</a>
       <a href="#!" class="modal-close btn-flat">Close</a>
     </div>
   </div>
@@ -103,12 +109,16 @@
   <!-- Add plant modal form -->
   <div id="addPlantModal" class="modal add-modal">
     <div class="modal-content">
-      <h4>Add a plant to the ledger</h4>
+      <h4>Add a plant to the database</h4>
       <form id="plantForm">
         <div class="row">
           <div class="input-field col s12 m6">
             <input id="plantName" type="text" required>
             <label for="plantName">Plant name</label>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="plantScientific" type="text">
+            <label for="plantScientific">Scientific name (optional)</label>
           </div>
           <div class="input-field col s12 m6">
             <select id="plantLight">
@@ -127,7 +137,14 @@
             <p class="radios">
               <label><input name="difficulty" type="radio" value="Easy" checked><span>Easy</span></label>
               <label><input name="difficulty" type="radio" value="Moderate"><span>Moderate</span></label>
+              <label><input name="difficulty" type="radio" value="Hard"><span>Hard</span></label>
             </p>
+          </div>
+          <div class="col s12 m6">
+            <label>Safe for pets?</label>
+            <div class="switch">
+              <label>No<input type="checkbox" id="plantPetSafe"><span class="lever"></span>Yes</label>
+            </div>
           </div>
           <div class="input-field col s12">
             <textarea id="plantDescription" class="materialize-textarea"></textarea>

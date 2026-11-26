@@ -1,82 +1,119 @@
+require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
+const Plant = require('./models/plant');
+const seedData = require('./data/seedData');
+
 const app = express();
 const port = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/plantCareHub';
 
-// Serve the front end (HTML, CSS, JS, images) from the public folder
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Plant data returned by the REST endpoint
-// lightLevel: low | medium | high   waterDays: how often to water (in days)
-const plantList = [
-  {
-    title: 'Monstera',
-    image: 'images/monstera.svg',
-    description: 'Big split leaves that love bright, indirect light. Water when the top 5 cm of soil is dry and wipe the leaves now and then.',
-    light: 'Bright, indirect',
-    lightLevel: 'medium',
-    water: 'Weekly',
-    waterDays: 7,
-    difficulty: 'Moderate',
-  },
-  {
-    title: 'Snake Plant',
-    image: 'images/snake-plant.svg',
-    description: 'Almost impossible to kill. Handles dark corners and only needs water every two to three weeks.',
-    light: 'Low to bright',
-    lightLevel: 'low',
-    water: 'Every 2–3 weeks',
-    waterDays: 18,
-    difficulty: 'Easy',
-  },
-  {
-    title: 'Tulsi (Holy Basil)',
-    image: 'images/tulsi.svg',
-    description: 'A fragrant herb that wants full sun and moist soil. Pinch off the flowers to keep it bushy and leafy.',
-    light: 'Full sun',
-    lightLevel: 'high',
-    water: 'Every 1–2 days',
-    waterDays: 1,
-    difficulty: 'Moderate',
-  },
-  {
-    title: 'Aloe Vera',
-    image: 'images/aloe-vera.svg',
-    description: 'A succulent with soothing gel. Give it a sunny window and let the soil dry out completely between waterings.',
-    light: 'Bright, direct',
-    lightLevel: 'high',
-    water: 'Every 2–3 weeks',
-    waterDays: 18,
-    difficulty: 'Easy',
-  },
-  {
-    title: 'Money Plant',
-    image: 'images/money-plant.svg',
-    description: 'A fast-growing trailing vine that grows happily in water or soil. Perfect for shelves and hanging pots.',
-    light: 'Medium, indirect',
-    lightLevel: 'medium',
-    water: 'Weekly',
-    waterDays: 7,
-    difficulty: 'Easy',
-  },
-  {
-    title: 'Peace Lily',
-    image: 'images/peace-lily.svg',
-    description: 'Glossy leaves and white flowers. It droops when it is thirsty, so it tells you exactly when to water.',
-    light: 'Low to medium',
-    lightLevel: 'low',
-    water: 'Weekly',
-    waterDays: 7,
-    difficulty: 'Easy',
-  },
-];
+// ---------- Helpers (all the logic now lives on the server) ----------
 
-// GET endpoint consumed by the client
-app.get('/api/plants', (req, res) => {
-  res.json({ statusCode: 200, data: plantList, message: 'Success' });
+// Same response shape as before: { statusCode, data, message }
+const send = (res, statusCode, data, message) => res.status(statusCode).json({ statusCode, data, message });
+
+// Escape user text before using it in a regular expression search
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Turn ?filter=...&search=... into a MongoDB query
+const buildQuery = ({ filter = 'all', search = '' }) => {
+  const query = {};
+  if (filter === 'easy') query.difficulty = 'Easy';
+  if (filter === 'low' || filter === 'high') query.lightLevel = filter;
+  if (filter === 'petsafe') query.petSafe = true;
+  if (search.trim()) query.name = { $regex: escapeRegex(search.trim()), $options: 'i' };
+  return query;
+};
+
+// ---------- REST API ----------
+
+// GET all plants, filtered and searched by MongoDB (newest first)
+app.get('/api/plants', async (req, res) => {
+  try {
+    const plants = await Plant.find(buildQuery(req.query)).sort({ createdAt: -1, name: 1 });
+    send(res, 200, plants, 'Success');
+  } catch (err) {
+    send(res, 500, null, 'Could not load plants');
+  }
 });
 
-app.listen(port, () => {
-  console.log('Leaf Ledger is running on http://localhost:' + port);
+// GET summary numbers for the dashboard tiles (counted by MongoDB)
+app.get('/api/plants/stats', async (req, res) => {
+  try {
+    const [total, petSafe, waterThisWeek] = await Promise.all([
+      Plant.countDocuments(),
+      Plant.countDocuments({ petSafe: true }),
+      Plant.countDocuments({ waterEveryDays: { $lte: 7 } }),
+    ]);
+    send(res, 200, { total, petSafe, waterThisWeek }, 'Success');
+  } catch (err) {
+    send(res, 500, null, 'Could not load stats');
+  }
 });
+
+// GET one plant for the care guide
+app.get('/api/plants/:id', async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) return send(res, 400, null, 'Invalid plant id');
+  try {
+    const plant = await Plant.findById(req.params.id);
+    if (!plant) return send(res, 404, null, 'Plant not found');
+    send(res, 200, plant, 'Success');
+  } catch (err) {
+    send(res, 500, null, 'Could not load plant');
+  }
+});
+
+// POST a new plant from the form (validated by the Mongoose schema)
+app.post('/api/plants', async (req, res) => {
+  try {
+    const { name, scientificName, lightLevel, waterEveryDays, difficulty, petSafe, careNotes } = req.body;
+    const plant = await Plant.create({
+      name, scientificName, lightLevel, difficulty, careNotes,
+      waterEveryDays: Number(waterEveryDays),
+      petSafe: petSafe === true || petSafe === 'true',
+    });
+    send(res, 201, plant, 'Plant added');
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return send(res, 400, null, Object.values(err.errors).map((e) => e.message).join(', '));
+    }
+    send(res, 500, null, 'Could not add plant');
+  }
+});
+
+// DELETE a plant
+app.delete('/api/plants/:id', async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) return send(res, 400, null, 'Invalid plant id');
+  try {
+    const plant = await Plant.findByIdAndDelete(req.params.id);
+    if (!plant) return send(res, 404, null, 'Plant not found');
+    send(res, 200, plant, 'Plant removed');
+  } catch (err) {
+    send(res, 500, null, 'Could not remove plant');
+  }
+});
+
+// ---------- Start: connect to MongoDB, seed if empty, then listen ----------
+const start = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log('Connected to MongoDB:', mongoose.connection.name);
+    if ((await Plant.countDocuments()) === 0) {
+      await Plant.insertMany(seedData);
+      console.log(`Database was empty, so ${seedData.length} sample plants were added`);
+    }
+    app.listen(port, () => console.log('Plant Care Hub is running on http://localhost:' + port));
+  } catch (err) {
+    console.error('Could not connect to MongoDB. Is it running?', err.message);
+    process.exit(1);
+  }
+};
+
+if (require.main === module) start();
+
+module.exports = { app, buildQuery };
